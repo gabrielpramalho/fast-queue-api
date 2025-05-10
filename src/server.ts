@@ -12,6 +12,7 @@ import fastifyJwt from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
 import { createAccount } from './http/routes/auth/create-account'
 import { authenticateWithPassword } from './http/routes/auth/authenticate-with-password'
+import { createQueue } from './http/routes/queue/create-queue'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -54,6 +55,8 @@ app.get('/', () => {
 
 app.register(createAccount)
 app.register(authenticateWithPassword)
+
+app.register(createQueue)
 
 app
   .listen({

@@ -3,6 +3,8 @@ import { FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import z from 'zod'
 
+import { faker } from '@faker-js/faker'
+
 import { prisma } from '@/lib/prisma'
 
 import { BadRequestError } from '../_errors/bad-request-error'
@@ -39,6 +41,8 @@ export async function createAccount(app: FastifyInstance) {
 
       const slug = generateSlug(name)
 
+      const avatarURL = faker.image.avatar()
+
       const establishmentWithSameSlug = await prisma.establishment.findUnique({
         where: {
           slug,
@@ -57,6 +61,7 @@ export async function createAccount(app: FastifyInstance) {
         data: {
           name,
           email,
+          avatarURL,
           slug,
           passwordHash,
         },
