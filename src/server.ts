@@ -18,6 +18,7 @@ import { getQueue } from './http/routes/queue/get-queue'
 import { activateQueue } from './http/routes/queue/activate-queue'
 import { createTicket } from './http/routes/tickets/create-ticket'
 import { errorHandler } from './error-handler'
+import { getTickets } from './http/routes/tickets/get-tickets'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -67,10 +68,9 @@ app.register(createQueue)
 app.register(getQueues)
 app.register(getQueue)
 app.register(activateQueue)
-// call next
-// get current ticket
 
 app.register(createTicket)
+app.register(getTickets)
 
 app
   .listen({
