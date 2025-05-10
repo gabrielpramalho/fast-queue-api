@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Establishment {
+  id           String @id @default(cuid())
+  slug         String @unique
+  name         String
+  email        String @unique
+  passwordHash String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  queues Queue[]
+
+  @@map("establishments")
+}
+
+model Queue {
+  id                   String  @id @default(cuid())
+  averageTimeInMinutes Int
+  isActive             Boolean
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  establishments  Establishment @relation(fields: [establishmentId], references: [id])
+  establishmentId String        @map("establishment_id")
+  tickets         Ticket[]
+
+  @@map("queues")
+}
+
+model Ticket {
+  id     String       @id @default(cuid())
+  number String
+  status TicketStatus
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  calledAt  DateTime? @map("called_at")
+
+  queue   Queue  @relation(fields: [queueId], references: [id])
+  queueId String @map("queue_id")
+
+  @@map("tickets")
+}
+
+enum TicketStatus {
+  WAITING
+  CALLED
+  DONE
+  SKIPPED
+}
