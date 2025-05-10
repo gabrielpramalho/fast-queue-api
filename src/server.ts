@@ -16,11 +16,15 @@ import { createQueue } from './http/routes/queue/create-queue'
 import { getQueues } from './http/routes/queue/get-queues'
 import { getQueue } from './http/routes/queue/get-queue'
 import { activateQueue } from './http/routes/queue/activate-queue'
+import { createTicket } from './http/routes/tickets/create-ticket'
+import { errorHandler } from './error-handler'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
 app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
+
+app.setErrorHandler(errorHandler)
 
 app.register(fastifySwagger, {
   openapi: {
@@ -63,6 +67,10 @@ app.register(createQueue)
 app.register(getQueues)
 app.register(getQueue)
 app.register(activateQueue)
+// call next
+// get current ticket
+
+app.register(createTicket)
 
 app
   .listen({
