@@ -16,6 +16,7 @@ export async function markAsSkip(app: FastifyInstance) {
         schema: {
           tags: ['tickets'],
           summary: 'Mark ticket as skip',
+          security: [{ bearerAuth: [] }],
           params: z.object({
             ticketId: z.string().cuid(),
           }),

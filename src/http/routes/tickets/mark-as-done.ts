@@ -16,6 +16,7 @@ export async function markAsDone(app: FastifyInstance) {
         schema: {
           tags: ['tickets'],
           summary: 'Mark ticket as done',
+          security: [{ bearerAuth: [] }],
           params: z.object({
             ticketId: z.string().cuid(),
           }),
