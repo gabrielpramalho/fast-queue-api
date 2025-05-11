@@ -22,6 +22,7 @@ import { getTickets } from './http/routes/tickets/get-tickets'
 import { getTicket } from './http/routes/tickets/get-ticket'
 import { markAsDone } from './http/routes/tickets/mark-as-done'
 import { markAsSkip } from './http/routes/tickets/mark-as-skip'
+import { callNext } from './http/routes/queue/call-next'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -77,6 +78,8 @@ app.register(getTickets)
 app.register(getTicket)
 app.register(markAsDone)
 app.register(markAsSkip)
+
+app.register(callNext)
 
 app
   .listen({
