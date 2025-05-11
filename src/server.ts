@@ -10,6 +10,7 @@ import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUi from '@fastify/swagger-ui'
 import fastifyJwt from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
+import fastifyWebsocket from '@fastify/websocket'
 import { createAccount } from './http/routes/auth/create-account'
 import { authenticateWithPassword } from './http/routes/auth/authenticate-with-password'
 import { createQueue } from './http/routes/queue/create-queue'
@@ -23,8 +24,15 @@ import { getTicket } from './http/routes/tickets/get-ticket'
 import { markAsDone } from './http/routes/tickets/mark-as-done'
 import { markAsSkip } from './http/routes/tickets/mark-as-skip'
 import { callNext } from './http/routes/queue/call-next'
+import { createWebSocketConnection } from './ws/connection'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
+
+app.register(fastifyCors, {
+  origin: '*',
+})
+
+app.register(fastifyWebsocket)
 
 app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
@@ -59,12 +67,6 @@ app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
 })
 
-app.register(fastifyCors)
-
-app.get('/', () => {
-  return 'hello world'
-})
-
 app.register(createAccount)
 app.register(authenticateWithPassword)
 
@@ -80,6 +82,8 @@ app.register(markAsDone)
 app.register(markAsSkip)
 
 app.register(callNext)
+
+app.register(createWebSocketConnection)
 
 app
   .listen({

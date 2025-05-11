@@ -5,6 +5,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import z from 'zod'
 import { BadRequestError } from '../_errors/bad-request-error'
 import { TicketStatus } from 'generated/prisma'
+import { OPEN } from 'ws'
 
 export async function callNext(app: FastifyInstance) {
   app
@@ -39,8 +40,6 @@ export async function callNext(app: FastifyInstance) {
           throw new BadRequestError('Does not exist tickets at this queue')
         }
 
-        // send message to websocket
-
         await prisma.ticket.update({
           data: {
             status: TicketStatus.CALLED,
@@ -50,6 +49,27 @@ export async function callNext(app: FastifyInstance) {
             id: firstTicket.id,
           },
         })
+
+        const connections = app.websocketServer.connectionsByQueue?.get(queueId)
+
+        if (connections) {
+          connections.forEach((socket: WebSocket) => {
+            if (socket.readyState === OPEN) {
+              socket.send(
+                JSON.stringify({
+                  type: 'newTicketCalled',
+                  ticket: {
+                    id: firstTicket.id,
+                    number: firstTicket.number,
+                    queueId: firstTicket.queueId,
+                    status: firstTicket.status,
+                    calledAt: firstTicket.calledAt,
+                  },
+                }),
+              )
+            }
+          })
+        }
 
         return reply.status(204).send()
       },
