@@ -3,6 +3,6 @@
 [x] - Create mark as done  
 [x] - Create mark as skip  
 [x] - Create get current ticket  
-[] - Add count of tickets at queue
-[] - Return average time correct at ticket
-[] - Create websocket connection
+[x] - Create websocket connection
+[x] - Add count of tickets at queue
+[x] - Return average time correct at ticket

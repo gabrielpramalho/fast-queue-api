@@ -23,6 +23,7 @@ export async function getQueues(app: FastifyInstance) {
                   title: z.string(),
                   averageTimeInMinutes: z.number().int().positive(),
                   isActive: z.boolean(),
+                  tickets: z.number(),
                 }),
               ),
             }),
@@ -32,16 +33,31 @@ export async function getQueues(app: FastifyInstance) {
       async (request) => {
         const establishmentId = await request.getCurrentUserId()
 
-        const queues = await prisma.queue.findMany({
+        const allQueues = await prisma.queue.findMany({
           select: {
             id: true,
             title: true,
             averageTimeInMinutes: true,
             isActive: true,
+            _count: {
+              select: {
+                tickets: true,
+              },
+            },
           },
           where: {
             establishmentId,
           },
+        })
+
+        const queues = allQueues.map((queue) => {
+          return {
+            id: queue.id,
+            title: queue.title,
+            averageTimeInMinutes: queue.averageTimeInMinutes,
+            isActive: queue.isActive,
+            tickets: queue._count.tickets,
+          }
         })
 
         return { queues }

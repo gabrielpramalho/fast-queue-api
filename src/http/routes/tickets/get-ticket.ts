@@ -28,6 +28,7 @@ export async function getTicket(app: FastifyInstance) {
                 number: z.string(),
                 status: z.nativeEnum(TicketStatus),
               }),
+              averageToBeCalled: z.number(),
             }),
           },
         },
@@ -61,7 +62,21 @@ export async function getTicket(app: FastifyInstance) {
           throw new BadRequestError('Ticket not found')
         }
 
-        return { ticket }
+        const ticketsAbove = await prisma.ticket.findMany({
+          where: {
+            queueId,
+            status: TicketStatus.WAITING,
+            number: {
+              lt: ticket.number,
+            },
+          },
+        })
+
+        const quantityTickets = ticketsAbove.length
+
+        const averageToBeCalled = queue.averageTimeInMinutes * quantityTickets
+
+        return { ticket, averageToBeCalled }
       },
     )
 }
